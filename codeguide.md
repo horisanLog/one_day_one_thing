@@ -153,9 +153,14 @@ AI提案生成エンジンを実装してください。
 
 提案はユーザーごとに1日1回生成し、suggestionsテーブルに保存。
 同日に再アクセスした場合はDBから取得（再生成しない）。
+
+テスト（vitest）:
+- /api/suggestions/today のintegrationテスト（認証済み/未認証）
+- /api/suggestions/generate のレスポンス形式検証
+- japanese-calendar.ts の季節・二十四節気判定のユニットテスト
 ```
 
-**確認ポイント**: APIを叩いて日本語の提案が返ること。天気・曜日が反映されていること。
+**確認ポイント**: APIを叩いて日本語の提案が返ること。天気・曜日が反映されていること。テストがパスすること。
 
 ---
 
@@ -193,9 +198,14 @@ UI/UXの要件:
 - GET /api/suggestions/today
 - POST /api/mood
 - POST /api/logs
+
+テスト（vitest）:
+- POST /api/logs のintegrationテスト（やった/スキップ記録）
+- POST /api/mood のintegrationテスト
+- SuggestionCard, ActionButtons のスナップショットテスト
 ```
 
-**確認ポイント**: 提案が表示され、やった/スキップが記録できること。写真アップロードが動くこと。
+**確認ポイント**: 提案が表示され、やった/スキップが記録できること。写真アップロードが動くこと。テストがパスすること。
 
 ---
 
@@ -226,9 +236,12 @@ Claude Codeへの指示:
 必要なコンポーネント:
 - components/log/LogCalendar.tsx
 - components/log/LogEntry.tsx
+
+テスト（vitest）:
+- GET /api/logs のintegrationテスト（プラン制限: 無料は直近7日、プレミアムは全期間）
 ```
 
-**確認ポイント**: カレンダーに記録が反映され、詳細画面でメモ・写真が表示されること。
+**確認ポイント**: カレンダーに記録が反映され、詳細画面でメモ・写真が表示されること。テストがパスすること。
 
 ---
 
@@ -288,6 +301,8 @@ LINE通知連携を実装してください（要件定義書 F-004）。
    
 3. app/api/cron/send-notifications/route.ts
    - Vercel Cron Jobsで毎朝7:00 JST（22:00 UTC）に実行
+   - CRON_SECRET環境変数でリクエストを認証（Authorizationヘッダーの検証）
+   - 不正なリクエストには401を返す
    - LINE連携済み & 通知ON のユーザー全員に一斉配信
    - 各ユーザーごとにパーソナライズされた提案テキスト + Webアプリへのリンク
 
@@ -297,6 +312,10 @@ LINE通知連携を実装してください（要件定義書 F-004）。
 
 LINE連携は、LINE Loginとは別に、LINE公式アカウントの友だち追加で
 ユーザーのLINE IDを取得する方式です。
+
+テスト（vitest）:
+- LINE Webhookのシグネチャ検証テスト
+- Cronエンドポイントの認証テスト（CRON_SECRET検証）
 
 vercel.json にcron設定を追加してください:
 {
@@ -330,6 +349,9 @@ app/(app)/settings/page.tsx:
 app/api/settings/route.ts:
 - GET: 現在の設定取得
 - PUT: 設定更新
+
+テスト（vitest）:
+- GET/PUT /api/settings のintegrationテスト（認証済み/未認証）
 
 アカウント削除時:
 - Supabase Authのユーザー削除
@@ -443,20 +465,26 @@ Claude Codeへの指示:
    - アプリアイコン
    - テーマカラー設定
 
-5. 環境変数チェック
+5. Rate Limiting
+   - API Routes（特に /api/suggestions/generate）にレート制限を実装
+   - Upstash Redisを使ったレート制限（サーバーレス環境対応）
+   - ※ メモリベースのレート制限はVercelのサーバーレス環境ではインスタンス間で状態が共有されないため不可
+   - 提案生成APIは1ユーザー1日1回に制限（外部APIコスト抑制）
+
+6. 環境変数チェック
    - .env.example が全変数を網羅していること
    - 環境変数未設定時のわかりやすいエラーメッセージ
 
-6. vercel.json
+7. vercel.json
    - Cron Jobs設定
    - リダイレクトルール
 
-7. README.md
+8. README.md
    - セットアップ手順
    - 開発コマンド
    - 環境変数一覧
 
-8. パフォーマンス確認
+9. パフォーマンス確認
    - 画像最適化（next/image使用の確認）
    - 不要なクライアントサイドJSの削減
    - Lighthouse スコア確認用のメモ

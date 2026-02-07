@@ -67,7 +67,7 @@ AIが毎朝たった1つの「小さな体験」を提案することで、選�
 | バックエンド | Next.js API Routes | - |
 | データベース | Supabase (PostgreSQL) | - |
 | 認証 | Supabase Auth | - |
-| AI | Claude API | claude-3-sonnet以上 |
+| AI | Claude API | claude-sonnet-4-20250514 |
 | 天気情報 | OpenWeather API | 3.0 |
 | 決済 | Stripe（※50人達成後に導入） | - |
 | ホスティング | Vercel | - |
@@ -359,6 +359,8 @@ AIが毎朝たった1つの「小さな体験」を提案することで、選�
 | context_data | jsonb | 生成時のコンテキスト | - |
 | created_at | timestamp | 作成日時 | NOT NULL |
 
+**制約**: `(user_id, date)` にUNIQUE制約（1ユーザー1日1提案を保証）
+
 #### experience_logs（体験ログ）
 
 | カラム名 | 型 | 説明 | 制約 |
@@ -370,6 +372,8 @@ AIが毎朝たった1つの「小さな体験」を提案することで、選�
 | memo | varchar(200) | メモ | - |
 | photo_url | varchar(500) | 写真URL | - |
 | recorded_at | timestamp | 記録日時 | NOT NULL |
+
+**制約**: `(user_id, suggestion_id)` にUNIQUE制約（1提案に対する記録の重複を防止）
 
 #### subscriptions（サブスクリプション）
 
@@ -393,6 +397,8 @@ AIが毎朝たった1つの「小さな体験」を提案することで、選�
 | mood | varchar(20) | 気分 | enum: great/good/normal/tired/low |
 | created_at | timestamp | 作成日時 | NOT NULL |
 
+**制約**: `(user_id, date)` にUNIQUE制約（1ユーザー1日1気分記録を保証。同日の再入力は上書き更新）
+
 ### 5.2 データ保持期間
 
 | データ種別 | 保持期間 |
@@ -411,9 +417,7 @@ AIが毎朝たった1つの「小さな体験」を提案することで、選�
 
 | エンドポイント | メソッド | 説明 |
 |:---------------|:---------|:-----|
-| /api/auth/signup | POST | ユーザー登録 |
-| /api/auth/login | POST | ログイン |
-| /api/auth/logout | POST | ログアウト |
+| /api/auth/callback | GET | Supabase Auth OAuthコールバック |
 | /api/suggestions/today | GET | 今日の提案取得 |
 | /api/suggestions/generate | POST | 提案生成（内部用） |
 | /api/logs | POST | 体験記録 |

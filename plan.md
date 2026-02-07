@@ -248,7 +248,7 @@ One Day One Thingの競合優位性は「引き算の設計思想」にありま
 | バックエンド | Next.js API Routes | 同一コードベース、デプロイが簡単 |
 | データベース | Supabase（PostgreSQL） | 無料プランあり、認証機能内蔵 |
 | 認証 | Supabase Auth | Google + メールログイン対応 |
-| AI | Claude API / GPT API | 高品質な日本語テキスト生成 |
+| AI | Claude API (claude-sonnet-4-20250514) | 高品質な日本語テキスト生成 |
 | 天気情報 | OpenWeather API | 無料で信頼性が高い |
 | 決済 | Stripe（※50人達成後に導入） | Webファースト、IAP依存なし |
 | ホスティング | Vercel | 無料プランあり、オートスケーリング |
@@ -435,9 +435,9 @@ Webからネイティブアプリへのシームレスな移行を実現する�
 |:--------------|:-----------|:------------------|
 | ユーザーインターフェース | Next.js Webアプリ（レスポンシブ） | + ネイティブアプリ（iOS/Android） |
 | 通知 | LINE公式アカウント | + プッシュ通知（ネイティブ） |
-| 認証 | Supabase Auth（Google + LINE） | 同一（Apple Sign-in追加） |
+| 認証 | Supabase Auth（Google + メール） | 同一（Apple Sign-in追加） |
 | 決済 | Stripe（※50人達成後に導入） | 同一（ネイティブからWeb決済） |
-| AI | Claude/GPT API | + 必要に応じてファインチューンモデル |
+| AI | Claude API | + 必要に応じてファインチューンモデル |
 | データベース | Supabase（PostgreSQL） | 同一 または専用DBへ移行 |
 
 ---
